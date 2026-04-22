@@ -4,7 +4,10 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Fernando Portela
 -/
 
-import Mathlib
+import Mathlib.Data.Nat.Lattice
+import Mathlib.Algebra.BigOperators.Group.Finset.Defs
+import Mathlib.Data.ZMod.Defs
+import Mathlib.Data.Nat.Prime.Defs
 
 /-!
 # Definitions for Landau's First Problem (Primes of the form n² + 1)

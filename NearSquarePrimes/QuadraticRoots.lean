@@ -5,6 +5,7 @@ Authors: Fernando Portela
 -/
 
 import NearSquarePrimes.Defs
+import Mathlib.NumberTheory.LegendreSymbol.Basic
 
 /-!
 # Properties of Quadratic Roots of x² ≡ -1 (mod p)

@@ -5,6 +5,10 @@ Authors: Fernando Portela
 -/
 
 import NearSquarePrimes.QuadraticRoots
+import Mathlib.Analysis.Normed.Ring.Lemmas
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Data.Int.Star
+import Mathlib.Tactic
 
 /-!
 # Finiteness of Sieve Collisions (Lemma 1)

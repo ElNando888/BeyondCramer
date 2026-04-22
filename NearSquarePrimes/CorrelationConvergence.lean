@@ -6,6 +6,10 @@ Authors: Fernando Portela
 
 import NearSquarePrimes.CollisionFiniteness
 import PoissonViaCRT
+import Mathlib.Analysis.PSeries
+import Mathlib.Data.Real.StarOrdered
+import Mathlib.Analysis.SpecialFunctions.Log.Summable
+
 
 /-!
 # Convergence of the Geometric Correlation (Lemma 2)
