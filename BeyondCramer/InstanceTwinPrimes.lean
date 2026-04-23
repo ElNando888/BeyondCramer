@@ -16,7 +16,7 @@ multipliability, positivity) available for twin primes as corollaries.
 ## Main Results
 
 * The `PoissonAdmissibleSieve` instance for the twin prime sieve.
-* The Krafft residues `{0, -2}` satisfy `κ(p) = 2` for odd primes.
+* The residues `{0, -2}` satisfy `κ(p) = 2` for odd primes.
 
 ## References
 
