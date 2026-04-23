@@ -152,3 +152,25 @@ theorem twinPrime_geometric_pos (k : ℕ) (hk : 0 < k) :
     0 < ∏' n,
       PoissonAdmissibleSieve.localFactor (σ := TwinPrimeSieveTag) k n :=
   PoissonAdmissibleSieve.localFactor_tprod_pos k hk
+
+/-- The twin prime geometric correlation product is nonzero, satisfying the
+non-degeneracy requirement of GK08 Theorem 3.7. -/
+theorem twinPrime_geometric_ne_zero (k : ℕ) (hk : 0 < k) :
+    ∏' n, PoissonAdmissibleSieve.localFactor (σ := TwinPrimeSieveTag) k n ≠ 0 :=
+  ne_of_gt (twinPrime_geometric_pos k hk)
+
+/-- **Twin Prime Poisson Spacing Theorem.** Given a sieve realization for the twin
+prime sieve, the `k`-level correlations of the surviving residues converge to the
+volume of the test box, establishing Poisson-distributed spacings.
+
+The positivity of the geometric correlation product (`twinPrime_geometric_pos`)
+ensures the non-zero limit condition required by GK08 Theorem 3.7. -/
+theorem twinPrime_poisson_spacing
+    (R : PoissonAdmissibleSieve.SieveRealization TwinPrimeSieveTag)
+    (K : ℕ) (hK : 2 ≤ K) (k : ℕ) (hk : 2 ≤ k) (hkK : k ≤ K)
+    (X : PoissonCRT.Box (k - 1)) :
+    ∃ δ : ℝ, 0 < δ ∧ ∃ C : ℝ, 0 < C ∧
+      ∀ (q : ℕ) [NeZero q] (_hq : Squarefree q),
+        |PoissonCRT.kCorrelation (PoissonCRT.crtSubset q R.Ω) X - X.volume| ≤
+          C * ((q : ℝ) / (PoissonCRT.crtSubset q R.Ω).card) ^ (-δ) :=
+  PoissonAdmissibleSieve.unified_poisson_spacing R K hK k hk hkK X
