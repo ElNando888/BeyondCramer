@@ -13,4 +13,4 @@ rev = "main"
 
 [[lean_lib]]
 name = "BeyondCramer"
-roots = ["TwinPrimes", "NearSquarePrimes", "BeyondCramer"]
+roots = ["BeyondCramer"]
