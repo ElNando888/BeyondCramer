@@ -5,7 +5,7 @@
    "type": "git",
    "subDir": null,
    "scope": "",
-   "rev": "23a1b62cd035079e63681ba2dacfcc72eaca5975",
+   "rev": "c36b0bdb4b6a8a3be54620bd0f4cda528eca2886",
    "name": "PoissonViaCRT",
    "manifestFile": "lake-manifest.json",
    "inputRev": "main",

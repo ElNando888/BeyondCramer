@@ -189,6 +189,13 @@ structure SieveRealization (σ : Type) [PoissonAdmissibleSieve σ] where
   controls the range of correlations for which the Poisson limit holds. -/
   spacing_bound : ∀ K : ℕ, ∀ p, Nat.Prime p →
     (p : ℝ) / (Ω p).card ≤ (p : ℝ) ^ (PoissonCRT.lambdaExponent K - ε)
+  /-- Bounding the number of excluded residue classes modulo `p` to 2.
+  
+  **Note:** While GK08 applies to polynomials of any degree, the `PoissonViaCRT`
+  formalization relies on `RiemannHypothesisCurves`, which currently only provides
+  the Hasse-Weil bound for curves of degree 2 (quadratic polynomials). Thus, we are
+  restricted here to sieves that exclude at most 2 residue classes per prime. -/
+  excluded_bound : ∀ (p : ℕ), Nat.Prime p → p - (Ω p).card ≤ 2
 
 /-- **Unified Poisson Spacing Theorem.** For any `PoissonAdmissibleSieve` equipped with
 a sieve realization, the normalized spacings between surviving residues converge to a
@@ -208,9 +215,18 @@ theorem unified_poisson_spacing (R : SieveRealization σ) (K : ℕ) (hK : 2 ≤ 
     ∃ δ : ℝ, 0 < δ ∧ ∃ C : ℝ, 0 < C ∧
       ∀ (q : ℕ) [NeZero q] (_hq : Squarefree q),
         |PoissonCRT.kCorrelation (PoissonCRT.crtSubset q R.Ω) X - X.volume| ≤
-          C * ((q : ℝ) / (PoissonCRT.crtSubset q R.Ω).card) ^ (-δ) :=
-  PoissonCRT.mainTheorem_precise R.ε R.hε K hK R.Ω R.Ω_nonempty
-    (fun p _ k _ => R.well_distributed p k) (R.spacing_bound K) k hk hkK X
+          C * ((q : ℝ) / (PoissonCRT.crtSubset q R.Ω).card) ^ (-δ) := by
+  have hrp : ∀ k' : ℕ, 2 ≤ k' → k' ≤ K → ∀ p : ℕ, Nat.Prime p → 1 - ↑(R.Ω p).card / (p : ℝ) ≤ (k' : ℝ) / (p : ℝ) := by
+    intro k' hk' _ p hp
+    have hp_pos : (0 : ℝ) < p := Nat.cast_pos.mpr hp.pos
+    rw [le_div_iff₀ hp_pos, sub_mul, one_mul, sub_le_iff_le_add]
+    have h_mul : ↑(R.Ω p).card / (p : ℝ) * (p : ℝ) = ↑(R.Ω p).card := div_mul_cancel₀ _ (ne_of_gt hp_pos)
+    rw [h_mul]
+    have h_bound := R.excluded_bound p hp
+    norm_cast
+    omega
+  exact PoissonCRT.mainTheorem_precise R.ε R.hε K hK R.Ω R.Ω_nonempty
+    (fun p _ k _ => R.well_distributed p k) (R.spacing_bound K) hrp k hk hkK X
 
 /-- The `k`-level correlation converges to the box volume along any sequence of
 squarefree moduli whose average spacing tends to infinity. This is a direct
