@@ -1,12 +1,12 @@
 # Beyond Cramér: A unified Poisson limit framework
 
-This repository contains the Lean 4 formalization for the mathematical paper **"Beyond Cramér: A unified Poisson limit framework for prime-representing sieve spacings"** by Fernando Portela (Ronin Institute for Independent Scholarship 2.0).
+This repository contains the Lean 4 formalization for the mathematical paper **"Beyond Cramér: A unified Poisson limit framework for prime-representing sieve spacings"**.
 
 ## Overview
 
 The formalization establishes a unified geometric framework that reduces the probabilistic distribution of prime-representing sieves to deterministic modular intersections. By formalizing a class of bounded-variance, multi-residue sieves, it proves that Poisson-distributed spacings are a necessary consequence of local geometric correlation.
 
-This unified theory resolves the transition from sieves with constant dimensions, such as the twin prime sieve ($x(x+2)$), to sieves with fluctuating dimensions governed by the Legendre symbol, such as Landau's First Problem ($n^2+1$). 
+This unified theory resolves the transition from sieves with constant dimensions, such as the twin prime sieve ($n(n+2)$), to sieves with fluctuating dimensions governed by the Legendre symbol, such as Landau's First Problem ($n^2+1$). 
 
 At the core of the repository is a machine-verified **Grand Convergence Theorem**, proving that any multi-residue sieve satisfying the collision threshold axioms admits a factorization of the $k$-tuple expectation into a single-event density and an absolutely convergent geometric correlation constant.
 
