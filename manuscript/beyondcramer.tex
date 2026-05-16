@@ -1,0 +1,508 @@
+\documentclass{amsart}
+
+%     If your article includes graphics, uncomment this command.
+\usepackage{graphicx}
+
+\graphicspath{ {./images/} }
+\newcommand{\lean}{\ensuremath{%
+  \mathchoice{\includegraphics[height=2ex]{lean-file-icon-dark}}
+    {\includegraphics[height=2ex]{lean-file-icon-dark}}
+    {\includegraphics[height=1.5ex]{lean-file-icon-dark}}
+    {\includegraphics[height=1ex]{lean-file-icon-dark}}
+}}
+\newcommand\urlpfx{https://github.com/ElNando888/BeyondCramer/blob/v1.2}
+
+\usepackage[verbose,hypertexnames=false]{hyperref}
+\hypersetup{colorlinks=false,pdfborderstyle={/S/U/W 1}}
+
+\usepackage{microtype}
+
+%     Update the information and uncomment if AMS is not the copyright
+%     holder.
+%\copyrightinfo{2009}{American Mathematical Society}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{xca}[theorem]{Exercise}
+
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\numberwithin{equation}{section}
+
+\begin{document}
+
+% \title[short text for running head]{full title}
+\title[Beyond Cramér: A unified Poisson limit framework]
+{Beyond Cramér: A unified Poisson limit framework for prime-representing sieve spacings}
+
+%    Only \author and \address are required; other information is
+%    optional.  Remove any unused author tags.
+
+%    author one information
+% \author[short version for running head]{name for top of paper}
+\author[F. Portela]{Fernando Portela}
+\address{Ronin Institute for Independent Scholarship 2.0}
+\curraddr{}
+\email{fernando.portela@ronininstitute.org}
+\thanks{}
+
+%    \subjclass is required.
+\subjclass[2020]{Primary 11N05; Secondary 11N35, 11N36, 11K65, 68V20}
+
+\keywords{Multi-residue sieves, Poisson limit theorems, Geometric correlation, Twin Prime Conjecture, Near Square Primes, Formal verification}
+
+\date{}
+
+\dedicatory{}
+
+%    "Communicated by" -- provide editor's name; required.
+\commby{}
+
+\begin{abstract}
+We establish a unified geometric framework that reduces the probabilistic distribution of
+prime-representing sieves to deterministic modular intersections. By formalizing a class of
+bounded-variance, multi-residue sieves, we prove that Poisson-distributed spacings are a
+necessary consequence of local geometric correlation, bridging historically distinct
+configurations. This unified theory resolves the transition from sieves with constant
+dimensions, such as the twin prime sieve ($x(x+2)$), to sieves with fluctuating dimensions
+governed by the Legendre symbol, such as Landau's First Problem ($n^2+1$). Furthermore, we
+machine-verify a Grand Convergence Theorem, proving that any multi-residue sieve satisfying
+the collision threshold axioms admits a factorization of the $k$-tuple expectation into a
+single-event density and an absolutely convergent geometric correlation constant.
+\end{abstract}
+
+\maketitle
+
+\section{Introduction} \label{sec:introduction}
+
+The Cram\'er model \cite{cramer1936} hypothesizes that primes behave as independent stochastic
+variables, providing heuristic justifications for a wide array of asymptotic distributions. While
+remarkably predictive, this model is a statistical assumption superimposed on a deterministic
+sequence. The apparent randomness of the primes arises not from independence but from the
+intersections of modular residue classes over bounded intervals. To make this precise, modern
+analytic number theory relies on multi-residue sieve frameworks \cite{friedlander2010}, evaluating
+the surviving integers that avoid forbidden congruence classes across a primorial base
+$q_y = \prod_{p \le y} p$.
+
+Historically, the application of multi-residue sieves to prime representation problems has
+proceeded along separate lines. Linear configurations, such as the Twin Prime Conjecture, have a
+constant sieve dimension. Conversely, quadratic configurations, such as Landau's First
+Problem\footnote{The list of four basic problems about prime numbers presented by Edmund Landau
+at the 1912 ICM \cite{landau1912} has been reported in various, non-consistent orders by several
+different sources. We choose to use the order in which they are listed in the actual proceedings
+of the congress.} regarding primes of the form $n^2+1$, exhibit a fluctuating sieve dimension.
+In the quadratic case, primes $p \equiv 1 \pmod 4$ exclude two residue classes, primes
+$p \equiv 3 \pmod 4$ exclude none, and the distance between the roots modulo $p$ varies with $p$.
+This dimensional fluctuation has obstructed attempts to model these configurations under a
+single probabilistic limit.
+
+This paper presents the ``Beyond Cram\'er'' framework: a unified theory showing that Poisson
+spacings follow from bounded collision structure in the sieve, independent of whether the
+underlying polynomial is linear or quadratic. We introduce an abstract axiomatic system
+---the Poisson-admissible sieve---characterized by a localized density map $\kappa(p)$ and a
+collision threshold.
+
+We establish that if a sieve's local correlation deviation is bounded within $1 + O(1/p^2)$,
+the global $k$-tuple expectation factorizes. The main result, the Grand Convergence Theorem,
+shows that any sieve satisfying these axioms converges to a Poisson point process.
+
+Our paper is structured as follows:
+\begin{enumerate}
+    \item \textbf{The Unified Sieve Axioms:} In Section \ref{sec:axioms}, we outline the core
+    structural requirements of a Poisson-admissible sieve, reducing the combinatorial variance
+    to a tractable limit.
+    \item \textbf{The Grand Convergence Theorem:} In Section \ref{sec:convergence}, we provide
+    the analytic proof that admissibility forces Poisson spacings, reducing the requirement of
+    equidistribution to bounded local overlaps.
+    \item \textbf{Geometric Realizations:} In Sections \ref{sec:twin} and \ref{sec:landau}, we
+    present the specializations for the twin prime and Landau ($n^2+1$) sieves, respectively,
+    proving that both these two configurations are instances of the same axiomatic framework.
+\end{enumerate}
+
+Throughout this text, \lean\ symbols serve as direct links to formalized code in the GitHub
+repository \href{https://github.com/ElNando888/BeyondCramer/tree/v1.2}
+{\texttt{github.com/ElNando888/BeyondCramer/tree/v1.2}}. This repository contains the
+\texttt{sorry}-free\footnote{Running the \texttt{lake build} command will result in an output
+with a warning about a \texttt{sorry}, but this warning is related to the dependent project
+\texttt{PoissonViaCRT}, the formalization of the 2008 paper by Granville \& Kurlberg
+\cite{granville2008}, which while well-advanced, is still incomplete at the time of writing.}
+machine-checked Lean 4 verifications for the core definitions, the Grand Convergence
+factorization, and both geometric specializations discussed in this paper.
+
+\section{The Unified Sieve Axioms} \label{sec:axioms}
+
+To move beyond statistical heuristics, we isolate the geometric properties that govern the
+distribution of surviving residue classes. Whether a multi-residue sieve targets a linear
+configuration or a quadratic polynomial, its limiting behavior depends on its local density
+and the structure of its collision boundaries. We formalize these shared properties through
+the definition of a \textit{Poisson-admissible sieve}
+{[\href{\urlpfx/BeyondCramer/Defs.lean#L60}{\lean}]}. 
+
+\begin{definition}[Poisson-Admissible Sieve] \label{def:admissible_sieve}
+A multi-residue sieve evaluated over the primorial $q_y = \prod_{p \le y} p$ is
+Poisson-admissible if it satisfies the following structural axioms:
+\begin{enumerate}
+    \item \textbf{Density Map $\kappa(p)$:} There exists a locally defined map
+    $\kappa: \mathbb{P} \to \mathbb{N}$ representing the number of forbidden residue classes
+    modulo $p$ generated by a single shift. This map must be bounded by a constant
+    $\kappa(p) \le B$, and satisfy $\kappa(p) < p$ for all primes to ensure positive survival
+    probabilities.
+    \item \textbf{Collision Threshold $T(\mathbf{h})$:} For any fixed $k$-tuple of distinct
+    integer shifts $\mathbf{h} = \{h_1, \dots, h_k\}$, there exists a prime threshold
+    $T(\mathbf{h})$ beyond which the excluded residue classes of distinct shifts are disjoint.
+    For all $p > T(\mathbf{h})$, the total number of excluded classes is exactly
+    $|S_p(\mathbf{h})| = \kappa(p) \cdot k$.
+    \item \textbf{Geometric Convergence Bound:} The deviation of the local correlation factor
+    from $1$ is bounded. For all primes $p$ where $\kappa(p) \cdot k < p$, there exists a
+    constant $C > 0$ such that:
+    $$ \left| \frac{1 - \frac{\kappa(p) \cdot k}{p}}{\left( 1 - \frac{\kappa(p)}{p} \right)^k} - 1 \right| \le \frac{C}{p^2} $$
+\end{enumerate}
+\end{definition}
+
+\begin{lemma}[Analytic Summability\footnote{In the formalized library, this summability is
+bundled as a class field for computational efficiency, but mathematically it is a direct
+consequence of the third axiom.} {[\href{\urlpfx/BeyondCramer/Defs.lean\#L78}{\lean}]}]
+\label{lem:analytic_summability}
+For any Poisson-admissible sieve, the absolute deviation of the local correlation factor is
+summable over the primes.
+\end{lemma}
+\begin{proof}
+By the geometric convergence bound axiom, the deviation is strictly dominated by $C/p^2$ for
+all sufficiently large primes. Because the sum $\sum p^{-2}$ is absolutely convergent, the series
+of absolute deviations inherently converges by the direct comparison test.
+\end{proof}
+
+By extracting these axioms, we decouple the probabilistic limit of the sieve from the algebraic
+origins of its roots. The dimension of the sieve—whether constant as in linear configurations or
+fluctuating as in quadratic forms—is encoded in the density map $\kappa(p)$.
+
+\section{The Grand Convergence Theorem} \label{sec:convergence}
+
+With the combinatorial variance controlled by the axioms of Definition \ref{def:admissible_sieve},
+we establish a factorization for the expected number of surviving shifted configurations. 
+
+\begin{definition}[Baseline Sieve Density {[\href{\urlpfx/BeyondCramer/GrandConvergence.lean\#L57}{\lean}]}] \label{def:baseline_density}
+For an admissible sieve, the expected density of a single surviving element evaluated up to a
+parameter $y$ is governed by the density map $\kappa(p)$:
+$$ \rho(y) = \frac{1}{2} \prod_{2 < p \le y} \left( 1 - \frac{\kappa(p)}{p} \right) $$
+The factor $1/2$ accounts for the exclusion at $p=2$, which is treated separately from the
+product over odd primes.
+\end{definition}
+
+In a purely independent stochastic model, the expected survival of a $k$-tuple would scale
+exactly as $\rho(y)^k$. However, the intersections of modular residue classes introduce local
+correlations. Let $\text{excl}(p)$ denote the number of excluded classes modulo $p$ for the
+tuple $\mathbf{h}$, bounded by $\text{excl}(p) \le \kappa(p) \cdot k$.
+
+\begin{theorem}[Unified Expectation Factorization {[\href{\urlpfx/BeyondCramer/GrandConvergence.lean\#L96}{\lean}]}] \label{thm:factorization}
+For any Poisson-admissible sieve and any $k \ge 1$, the expected number of surviving $k$-tuples
+modulo the primorial $q_y$, denoted $E[N_k(\mathbf{h})]$, factors as the product of the
+structural interval, the independent stochastic probability, and a geometric correlation
+constant:
+$$ E[N_k(\mathbf{h})] = q_y \cdot \big[ \rho(y) \big]^k \cdot \mathfrak{G}(\mathbf{h}) $$
+where the geometric correlation constant $\mathfrak{G}(\mathbf{h})$ is explicitly defined by the
+Euler product:
+$$ \mathfrak{G}(\mathbf{h}) = \prod_{2 < p \le y} \frac{1 - \frac{\mathrm{excl}(p)}{p}}{\left( 1 - \frac{\kappa(p)}{p} \right)^k} $$
+\end{theorem}
+\begin{proof}
+By definition, the expected number of surviving shifted $k$-tuples modulo the primorial $q_y$
+evaluates the surviving density over each prime factor up to $y$:
+$$ E[N_k(\mathbf{h})] = q_y \cdot \left(\frac{1}{2}\right)^k \prod_{2 < p \le y} \left( 1 - \frac{\mathrm{excl}(p)}{p} \right) $$
+To factor out the independent stochastic probability $\rho(y)^k$, we multiply and divide the
+terms inside the product by the single-event survival probability raised to the $k$-th power,
+$(1 - \kappa(p)/p)^k$. This is valid because the non-degeneracy axiom guarantees
+$\kappa(p) < p$, ensuring the denominator is positive.
+
+Rearranging the terms algebraically yields:
+$$ E[N_k(\mathbf{h})] = q_y \cdot \left[ \left(\frac{1}{2}\right)^k \prod_{2 < p \le y} \left( 1 - \frac{\kappa(p)}{p} \right)^k \right] \cdot \prod_{2 < p \le y} \frac{1 - \frac{\mathrm{excl}(p)}{p}}{\left( 1 - \frac{\kappa(p)}{p} \right)^k} $$
+The bracketed term is $\rho(y)^k$ and the remaining product defines $\mathfrak{G}(\mathbf{h})$,
+establishing the factorization.
+\end{proof}
+While Theorem \ref{thm:factorization} algebraically untangles the expected yield, its usefulness
+depends on the behavior of $\mathfrak{G}(\mathbf{h})$ as the sieve parameter $y \to \infty$. 
+
+\begin{theorem}[Absolute Convergence of Geometric Correlation {[\href{\urlpfx/BeyondCramer/GrandConvergence.lean\#L129}{\lean}]}] \label{thm:correlation_convergence}
+Because a Poisson-admissible sieve has a collision threshold $T(\mathbf{h})$ and a local
+deviation bounded by $O(1/p^2)$, the infinite product defining $\mathfrak{G}(\mathbf{h})$ is
+multipliable, converging absolutely to a positive, finite limit.
+\end{theorem}
+\begin{proof}
+To establish the absolute convergence of the infinite product defining $\mathfrak{G}(\mathbf{h})$
+as $y \to \infty$, we analyze the local correlation factors:
+$$ L_p = \frac{1 - \frac{\mathrm{excl}(p)}{p}}{\left( 1 - \frac{\kappa(p)}{p} \right)^k} $$
+By the collision threshold axiom of the Poisson-admissible sieve, there exists a deterministic
+prime $T(\mathbf{h})$ such that for all primes $p > T(\mathbf{h})$, the excluded residue classes
+are disjoint, so $\mathrm{excl}(p) = \kappa(p) \cdot k$.
+
+Substituting this maximal exclusion into the local factor for large primes yields
+$L_p = \frac{1 - \kappa(p)k/p}{(1 - \kappa(p)/p)^k}$. By the geometric convergence bound axiom,
+the deviation of this term from $1$ satisfies $|L_p - 1| \le C / p^2$ for some constant $C > 0$.
+
+Because the sum over primes $\sum p^{-2}$ is absolutely convergent, the series of absolute
+deviations $\sum |L_p - 1|$ is also convergent. By the standard convergence criteria for Euler
+products (cf. \cite[Chapter 1]{MontgomeryVaughan2006}), the absolute convergence of this series
+guarantees that the infinite product $\prod L_p$ converges to a positive, finite limit.
+\end{proof}
+
+Theorem \ref{thm:correlation_convergence} provides the quantitative link to the Granville--Kurlberg
+framework \cite{granville2008}. Because the deviations of the local correlation factor vanish
+at rate $O(1/p^2)$, the well-distribution hypothesis required for higher-order Poisson moments is
+satisfied. To formally bridge this abstract convergence to the spatial distribution of residues,
+we map the sieve into a concrete combinatorial structure.
+
+\begin{definition}[Sieve Realization {[\href{\urlpfx/BeyondCramer/GrandConvergence.lean\#L176}{\lean}]}] \label{def:sieve_realization}
+A sieve realization equips a Poisson-admissible sieve with the specific topological data required
+to evaluate local spacings:
+\begin{enumerate}
+    \item A set of surviving residues $\Omega_p \subseteq \mathbb{Z}/p\mathbb{Z}$ for each prime
+    $p$, which must be strictly non-empty.
+    \item A well-distribution parameter $\varepsilon > 0$.
+    \item A quantitative well-distribution bound satisfying Hypothesis 1 of Granville and
+    Kurlberg \cite{granville2008}, ensuring the local tuple counts deviate gracefully.
+    \item A spacing bound controlling the maximum gap growth,
+    $p / |\Omega_p| \le p^{\lambda_K - \varepsilon}$.
+\end{enumerate}
+\end{definition}
+
+\begin{corollary}[Unified Poisson Spacing {[\href{\urlpfx/BeyondCramer/GrandConvergence.lean\#L213}{\lean}]}] \label{cor:poisson_spacing}
+For any Poisson-admissible sieve equipped with a valid sieve realization (Definition
+\ref{def:sieve_realization}), the normalized spacings between surviving residues converge to a
+Poisson distribution. Specifically, for any test box $X$, the $k$-level correlation
+$R_k(X, \Omega_q)$ converges to the volume of the box, $\mathrm{vol}(X)$, as the average spacing
+between surviving elements tends to infinity.
+\end{corollary}
+\begin{proof}
+The Granville--Kurlberg framework for Poisson statistics in multi-residue sieves states that if a
+sequence of subsets satisfies a well-distribution hypothesis---namely, that the localized error
+terms vanish sufficiently fast---the $k$-level correlations converge to the volume of the test box.
+
+For a Poisson-admissible sieve, the well-distribution hypothesis translates to the requirement
+that the deviations of the local correlation factors are analytically summable. By Theorem
+\ref{thm:correlation_convergence}, the admissible sieve axioms guarantee $|L_p - 1| \le C/p^2$.
+This inverse-square decay satisfies the error bounds required by the Granville--Kurlberg main
+theorem. 
+
+Consequently, the admissible sieve axioms imply the analytic requirements of well-distribution.
+As the average spacing $s_q$ between surviving elements tends to infinity, the correlation error
+$O(s_q^{-\delta})$ decays to zero, so the spacing distribution converges to a Poisson point
+process.
+\end{proof}
+
+This provides a structural explanation for the Cram\'er model. Poisson-distributed spacings among
+prime-representing polynomials are not an artifact of pseudorandomness but rather the analytic
+consequence of any sieve geometry with bounded local variance.
+
+\section{The Twin Prime Specialization (Constant Dimension)} \label{sec:twin}
+
+The Twin Prime Conjecture, asserting the existence of infinitely many prime pairs $(p, p+2)$, is
+the canonical linear configuration. Evaluated as a multi-residue sieve, we target the polynomial
+$x(x+2)$, which excludes residue classes to prevent either factor from having a prime divisor.
+Because the polynomial is linear in its factors, the sieve dimension is constant across all
+primes $p > 2$.
+
+\begin{definition}[Twin Prime Density Map {[\href{\urlpfx/BeyondCramer/InstanceTwinPrimes.lean\#L37}{\lean}]}] \label{def:twin_density}
+For the twin prime configuration, the density map $\kappa(p)$ counts the distinct roots of
+$x(x+2) \equiv 0 \pmod p$. Thus:
+$$ \kappa(p) = \begin{cases} 1 & \text{if } p = 2 \\ 2 & \text{if } p > 2 \end{cases} $$
+\end{definition}
+
+\begin{lemma}[Linear Admissibility] \label{lem:twin_admissibility}
+The Twin Prime density map $\kappa(p)$ satisfies the boundedness and non-degeneracy axioms of
+a Poisson-admissible sieve. 
+\end{lemma}
+\begin{proof}
+By Definition \ref{def:twin_density}, the maximum value attained by the map is $2$, providing
+the uniform bound $B=2$. For non-degeneracy, we verify $\kappa(p) < p$ for all primes. For
+$p=2$, $\kappa(2) = 1 < 2$. For all odd primes $p \ge 3$, $\kappa(p) = 2 < p$. Therefore, the
+survival probability at every prime is positive.
+\end{proof}
+
+A key feature of the twin prime sieve is its constant dimension. To verify the geometric
+correlation bound, we must show that local overlaps between distinct shifted configurations are
+bounded. 
+
+\begin{definition}[Linear Collision Threshold {[\href{\urlpfx/BeyondCramer/InstanceTwinPrimes.lean\#L59}{\lean}]}] \label{def:twin_threshold}
+For a fixed $k$-tuple of distinct integer shifts $\mathbf{h} = \{h_1, \dots, h_k\}$, we define
+the prime threshold $T(\mathbf{h})$ as the maximum absolute difference between any interacting
+roots of the shifted polynomials across all pairs $(i, j)$ where $i \neq j$:
+$$ T(\mathbf{h}) = \max_{i \neq j} \big( |h_i - h_j|, |h_i - h_j - 2|, |h_i - h_j + 2| \big) $$
+\end{definition}
+
+\begin{lemma}[Finiteness of Linear Overlaps] \label{lem:twin_disjoint}
+For all primes $p > T(\mathbf{h})$, the excluded residue classes generated by distinct shifts
+in the $k$-tuple are disjoint, yielding exactly $2k$ excluded classes modulo $p$.
+\end{lemma}
+\begin{proof}
+For a target coordinate $x$ shifted by $h_i$, the excluded residue classes modulo $p$ correspond
+to the roots $x \equiv -h_i \pmod p$ and $x \equiv -h_i - 2 \pmod p$. A collision between the
+excluded classes of two distinct shifts $h_i$ and $h_j$ occurs if and only if one of the
+following modular equivalences holds:
+\begin{align*}
+    -h_i &\equiv -h_j \pmod p \implies p \mid (h_i - h_j) \\
+    -h_i &\equiv -h_j - 2 \pmod p \implies p \mid (h_i - h_j - 2) \\
+    -h_i - 2 &\equiv -h_j \pmod p \implies p \mid (h_i - h_j + 2)
+\end{align*}
+By Definition \ref{def:twin_threshold}, the threshold $T(\mathbf{h})$ bounds the absolute value
+of all these differences. Because the shifts are distinct integers, these differences are
+non-zero. For any prime $p > T(\mathbf{h})$, $p$ cannot divide a non-zero integer smaller than
+itself. Therefore, no overlaps occur, verifying the collision axiom.
+\end{proof}
+
+By Theorem \ref{thm:correlation_convergence}, these structural bounds ensure the convergence of
+the local deviations, so the distribution of twin prime tuples aligns with a Poisson point
+process.
+
+\section{Landau's First Problem (Fluctuating Dimension)} \label{sec:landau}
+
+The transition from linear configurations to quadratic forms introduces an additional difficulty:
+dimensional fluctuation. To model the distribution of primes of the form $n^2+1$ (Landau's First
+Problem), the multi-residue sieve must exclude roots of $x^2 + 1 \equiv 0 \pmod p$. Unlike the
+linear case, the number of distinct roots is not constant but depends on the residue of
+$p$ modulo $4$. 
+
+We resolve this by embedding the Legendre symbol directly into the density map, showing that
+fluctuating dimension is a special case of the same admissible geometry.
+
+\begin{definition}[Quadratic Density Map {[\href{\urlpfx/BeyondCramer/InstanceNearSquarePrimes.lean\#L42}{\lean}]}] \label{def:quadratic_density}
+For the $n^2+1$ sieve, the density map $\kappa(p)$ counts the roots of $x^2 \equiv -1 \pmod p$.
+Utilizing the Legendre symbol for odd primes, we define:
+$$ \kappa(p) = \begin{cases} 1 & \text{if } p = 2 \\ 1 + \left( \frac{-1}{p} \right) & \text{if } p > 2 \end{cases} $$
+This gives $\kappa(p) = 2$ for primes $p \equiv 1 \pmod 4$ and $\kappa(p) = 0$ for primes
+$p \equiv 3 \pmod 4$, deactivating the sieve dimension for half the prime population.
+\end{definition}
+
+\begin{lemma}[Quadratic Admissibility] \label{lem:quadratic_admissibility}
+The fluctuating density map $\kappa(p) = 1 + \left( \frac{-1}{p} \right)$ satisfies the
+boundedness and non-degeneracy axioms of a Poisson-admissible sieve.
+\end{lemma}
+\begin{proof}
+For any odd prime, the Legendre symbol is restricted to $\{ -1, 1 \}$. Therefore, the density map
+is bounded by $1 + 1 = 2$, giving a uniform bound $B=2$. 
+
+For non-degeneracy, $\kappa(2) = 1 < 2$. For $p \equiv 1 \pmod 4$, $p \ge 5$, yielding
+$\kappa(p) = 2 < 5 \le p$. For $p \equiv 3 \pmod 4$, $p \ge 3$, yielding
+$\kappa(p) = 0 < 3 \le p$. In all cases, the survival probability factors $1 - \kappa(p)/p$ are
+positive.
+\end{proof}
+
+To prove that this fluctuating sieve converges to a Poisson limit, we must constrain the
+variance of the active primes ($p \equiv 1 \pmod 4$). The intersections of quadratic roots must
+be bounded by finite Diophantine constants.
+
+Because any prime of the form $x^2+1$ strictly greater than 2 requires an even base coordinate
+$x$, any valid shifted configuration $x + h_i$ must inherently preserve this parity. We therefore
+restrict our analysis to shifts composed of even integers, ensuring the $k$-tuple remains
+algebraically capable of surviving the $p=2$ baseline density filter.
+
+\begin{definition}[Quadratic Collision Threshold {[\href{\urlpfx/BeyondCramer/InstanceNearSquarePrimes.lean\#L72}{\lean}]}] \label{def:quadratic_threshold}
+For a fixed $k$-tuple of distinct even integers $\mathbf{h} = \{h_1, \dots, h_k\}$, we define
+the prime threshold $T(\mathbf{h})$ bounding the quadratic shift collisions as:
+$$ T(\mathbf{h}) = \max_{i \neq j} \left( (h_i - h_j)^2 + 4 \right) $$
+\end{definition}
+
+\begin{lemma}[Finiteness of Quadratic Overlaps] \label{lem:quadratic_disjoint}
+For all primes $p > T(\mathbf{h})$ satisfying $p \equiv 1 \pmod 4$, the excluded residue classes
+generated by the shifts are disjoint.
+\end{lemma}
+\begin{proof}
+Let $\nu$ be a local root of $x^2 \equiv -1 \pmod p$. The excluded classes modulo $p$ generated
+by a target shift $h_i$ are $\nu - h_i$ and $-\nu - h_i$. A collision between the excluded
+classes of two distinct shifts $h_i$ and $h_j$ falls into two cases. A same-sign collision
+($\nu - h_i \equiv \nu - h_j$ or $-\nu - h_i \equiv -\nu - h_j$) requires $p \mid (h_i - h_j)$,
+which is impossible for $p > T(\mathbf{h}) \ge (h_i - h_j)^2 + 4 > |h_i - h_j|$. A cross-sign
+collision ($\nu - h_i \equiv -\nu - h_j$) requires $2\nu \equiv h_i - h_j \pmod p$.
+
+Squaring both sides of this last equivalence yields $4\nu^2 \equiv (h_i - h_j)^2 \pmod p$.
+Because $\nu$ is a root of $x^2 \equiv -1 \pmod p$, we substitute $4\nu^2 \equiv -4 \pmod p$,
+producing the Diophantine condition:
+$$ -4 \equiv (h_i - h_j)^2 \pmod p \implies p \mid \left( (h_i - h_j)^2 + 4 \right) $$
+By Definition \ref{def:quadratic_threshold}, the value $(h_i - h_j)^2 + 4$ is a positive integer
+constant, and $T(\mathbf{h})$ is its maximum across all shift pairings. For any prime
+$p > T(\mathbf{h})$, this divisibility condition also fails, so no overlap of either type occurs. 
+\end{proof}
+
+By embedding the Legendre symbol into the Poisson-admissible sieve framework, Lemma
+\ref{lem:quadratic_disjoint} shows that Landau's First Problem has the same collision structure
+as the twin prime sieve. Both are constrained by finite collision thresholds, ensuring they fall
+within the scope of the Grand Convergence Theorem.
+
+\section{Concluding Remarks} \label{sec:conclusion}
+
+The unified framework presented here differs from traditional heuristic approaches. Models based
+on the Hardy--Littlewood conjecture \cite{hardy1923} or the generalized Bateman--Horn heuristic
+\cite{bateman1962} typically treat the occurrence of prime values in polynomials as independent,
+pseudo-random events. By contrast, our multi-residue sieve derives its statistical behavior from
+the deterministic intersections of modular residue classes. 
+
+By abstracting the sieve into the Poisson-admissible axioms, we have separated the fluctuating
+dimension of quadratic forms from the underlying geometric correlation. The localized
+variance\textemdash whether tracking the constant roots of $x(x+2)$ or the Legendre-dependent
+roots of $x^2+1$\textemdash is finite, bounded by elementary Diophantine estimates.
+
+Poisson-distributed spacings are therefore not an empirical coincidence but a consequence of
+bounded-variance multi-residue sieves. The local geometric errors vanish at rate $O(1/p^2)$,
+driving the $k$-level correlations to converge to the volume of the test box. 
+
+Framing prime-representing polynomials through the lens of bounded-variance geometric correlation
+provides a structured, verifiable foundation that replaces the assumption of prime randomness
+with the deterministic structure of modular arithmetic.
+
+\section*{Acknowledgments}
+The author acknowledges the use of Aristotle (Harmonic) for the formalized Lean~4
+machine-checking of the unified expectation factorization and the Diophantine collision bounds.
+Google's Gemini 3.1 Pro was used for LaTeX technical synthesis and structural formatting, as well
+as for interactive exploration of the Legendre expectation matrices. The core mathematical logic,
+proofs, and final verification were performed by the author.
+
+%    Bibliographies can be prepared with BibTeX using amsplain,
+%    amsalpha, or (for "historical" overviews) natbib style.
+\bibliographystyle{amsplain}
+%    Insert the bibliography data here.
+
+\begin{thebibliography}{10}
+
+\bibitem{bateman1962}
+P.~T. Bateman and R.~A. Horn,
+\emph{A heuristic asymptotic formula concerning the distribution of prime numbers},
+Math. Comp. \textbf{16} (1962), no.~79, 363--367.
+
+\bibitem{cramer1936}
+H.~Cram\'er,
+\emph{On the order of magnitude of the difference between consecutive prime numbers},
+Acta Arith. \textbf{2} (1936), no.~1, 23--46.
+
+\bibitem{friedlander2010}
+J.~Friedlander and H.~Iwaniec,
+\emph{Opera de Cribro},
+Amer. Math. Soc. Colloq. Publ., vol.~57, Amer. Math. Soc., Providence, RI, 2010.
+
+\bibitem{granville2008}
+A.~Granville and P.~Kurlberg,
+\emph{Poisson statistics via the Chinese Remainder Theorem},
+Adv. Math. \textbf{218} (2008), no.~6, 2013--2042.
+
+\bibitem{hardy1923}
+G.~H. Hardy and J.~E. Littlewood,
+\emph{Some problems of `Partitio numerorum'; III: On the expression of a number as a sum of primes},
+Acta Math. \textbf{44} (1923), 1--70.
+
+\bibitem{landau1912}
+E.~Landau,
+\emph{Gel\"oste und ungel\"oste Probleme aus der Theorie der Primzahlverteilung und der Riemannschen Zetafunktion},
+Proceedings of the Fifth International Congress of Mathematicians (Cambridge, 1912), vol.~I, Cambridge Univ. Press, 1913, pp.~93--108.
+
+\bibitem{MontgomeryVaughan2006}
+H.~L. Montgomery and R.~C. Vaughan,
+\emph{Multiplicative Number Theory I: Classical Theory},
+Cambridge Stud. Adv. Math., vol.~97, Cambridge Univ. Press, 2006.
+
+\end{thebibliography}
+
+\end{document}

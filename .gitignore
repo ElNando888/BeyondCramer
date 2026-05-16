@@ -1,3 +1,17 @@
 .lake/
 scripts/
 manuscripts/
+manuscript/archive/
+manuscript/draft/
+*.aux
+*.bbl
+*.blg
+*.dvi
+*.fdb_latexmk
+*.fls
+*.lof
+*.lot
+*.out
+*.synctex.gz
+*.toc
+*.log
