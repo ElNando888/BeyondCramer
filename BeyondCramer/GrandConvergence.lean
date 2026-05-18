@@ -191,10 +191,11 @@ structure SieveRealization (σ : Type) [PoissonAdmissibleSieve σ] where
     (p : ℝ) / (Ω p).card ≤ (p : ℝ) ^ (PoissonCRT.lambdaExponent K - ε)
   /-- Bounding the number of excluded residue classes modulo `p` to 2.
   
-  **Note:** While GK08 applies to polynomials of any degree, the `PoissonViaCRT`
-  formalization relies on `RiemannHypothesisCurves`, which currently only provides
-  the Hasse-Weil bound for curves of degree 2 (quadratic polynomials). Thus, we are
-  restricted here to sieves that exclude at most 2 residue classes per prime. -/
+  **Note:** This limits the realization to sieves that exclude at most 2 residue classes
+  per prime (such as the twin prime Krafft sieve). By restricting the number of
+  excluded residue classes to a small constant, the well-distribution hypothesis
+  is satisfied via elementary inclusion-exclusion combinatorial counting, avoiding the need
+  for any deep algebraic geometry (such as Hasse-Weil bounds). -/
   excluded_bound : ∀ (p : ℕ), Nat.Prime p → p - (Ω p).card ≤ 2
 
 /-- **Unified Poisson Spacing Theorem.** For any `PoissonAdmissibleSieve` equipped with

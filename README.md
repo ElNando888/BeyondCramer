@@ -24,7 +24,7 @@ At the core of the repository is a machine-verified **Grand Convergence Theorem*
 This project is built using Lean 4 and depends on:
 * **[mathlib4](https://github.com/leanprover-community/mathlib4)** (v4.28.0)
 * **[PoissonViaCRT](https://github.com/ElNando888/PoissonViaCRT)**: Provides the underlying Poisson statistics via the Chinese Remainder Theorem, based on the Granville-Kurlberg 2008 paper. 
-  > *Note:* Due to current limitations in the `RiemannHypothesisCurves` library (a slightly edited fork of a formalization by Math-Inc) regarding the general Hasse-Weil bound, `PoissonViaCRT` is restricted to bounding polynomials of degree $\le 2$. This perfectly accommodates our applications to twin primes and near-square primes, which exclude at most 2 residue classes per prime.
+  > *Note:* Our sieve applications (twin primes and near-square primes) exclude a bounded number of residue classes per prime (at most 2). This additive combinatorial structure trivially satisfies the `WellDistributed` and spacing hypotheses required by `PoissonViaCRT` via elementary inclusion-exclusion, bypassing any need for deep algebraic geometry (such as Hasse-Weil bounds).
 
 ## Building
 
