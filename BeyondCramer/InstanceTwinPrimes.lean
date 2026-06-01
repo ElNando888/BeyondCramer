@@ -137,7 +137,7 @@ noncomputable instance twinPrimeSieve : PoissonAdmissibleSieve TwinPrimeSieveTag
   correlation_summable := fun k hk => by
     convert twinPrime_correlation_deviation_summable k hk using 1;
     ext n; by_cases hn : n = 2 <;> simp +decide [ hn, twinPrimeKappa ] ;
-    rcases k with ( _ | _ | k ) <;> norm_num at *
+    rcases k with ( _ | _ | k ) <;> try norm_num at * <;> try omega
 
 /-! ### Corollaries -/
 
