@@ -3,6 +3,7 @@ scripts/
 manuscripts/
 manuscript/archive/
 manuscript/draft/
+manuscript/acta/
 *.aux
 *.bbl
 *.blg
