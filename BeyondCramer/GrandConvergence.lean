@@ -185,10 +185,9 @@ structure SieveRealization (σ : Type) [PoissonAdmissibleSieve σ] where
   /-- Hypothesis (1) of GK08: well-distribution of tuple counts at each prime. -/
   well_distributed : ∀ (p : ℕ) [Fact p.Prime] (k : ℕ),
     PoissonCRT.WellDistributed ε p (Ω p) k
-  /-- Spacing bound: `s_p ≤ p^{λ_K - ε}` for all primes `p`. The parameter `K`
-  controls the range of correlations for which the Poisson limit holds. -/
-  spacing_bound : ∀ K : ℕ, ∀ p, Nat.Prime p →
-    (p : ℝ) / (Ω p).card ≤ (p : ℝ) ^ (PoissonCRT.lambdaExponent K - ε)
+  /-- Spacing bound: `s_p ≤ p^{λ_2 - ε}` for all primes `p`. -/
+  spacing_bound : ∀ p, Nat.Prime p →
+    (p : ℝ) ^ (PoissonCRT.lambdaExponent 2 - ε) ≤ (p : ℝ) / (Ω p).card
   /-- Bounding the number of excluded residue classes modulo `p` to 2.
   
   **Note:** This limits the realization to sieves that exclude at most 2 residue classes
@@ -227,7 +226,7 @@ theorem unified_poisson_spacing (R : SieveRealization σ) (K : ℕ) (hK : 2 ≤ 
     norm_cast
     omega
   exact PoissonCRT.mainTheorem_precise R.ε R.hε K hK R.Ω R.Ω_nonempty
-    (fun p _ k _ => R.well_distributed p k) (R.spacing_bound K) hrp k hk hkK X
+    (fun p _ k _ => R.well_distributed p k) R.spacing_bound hrp k hk hkK X
 
 /-- The `k`-level correlation converges to the box volume along any sequence of
 squarefree moduli whose average spacing tends to infinity. This is a direct
